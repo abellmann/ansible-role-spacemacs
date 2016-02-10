@@ -1,0 +1,36 @@
+---
+# tasks file for spacemacs
+
+
+
+# git clone https://github.com/syl20bnr/spacemacs ~/.emacs.d
+
+- name: install git 
+  become: yes
+  apt:
+    name: git-core
+    update_cache: yes
+    state: present 
+
+- name: install emacs 
+  become: yes
+  apt: 
+    name: emacs
+    update_cache: yes
+    state: present
+
+- name: install spacemacs 
+  git:
+    repo: "https://github.com/syl20bnr/spacemacs"
+    dest: "~/.emacs.d"
+    clone: yes
+    force: no
+    accept_hostkey: yes
+ 
+- name: make spacemacs config file
+  template: 
+    src: spacemacs.config.j2 
+    dest: '/home/{{ ansible_ssh_user }}/.spacemacs' 
+    owner: '{{ ansible_ssh_user }}'
+    group: '{{ ansible_ssh_user }}' 
+    mode: 0640
