@@ -22,7 +22,7 @@
 - name: install spacemacs 
   git:
     repo: "https://github.com/syl20bnr/spacemacs"
-    dest: "~/.emacs.d"
+    dest: "/home/{{ ansible_ssh_user }}/.emacs.d"
     clone: yes
     force: no
     accept_hostkey: yes
