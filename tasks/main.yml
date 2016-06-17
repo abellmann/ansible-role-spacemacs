@@ -24,7 +24,7 @@
     repo: "https://github.com/syl20bnr/spacemacs"
     dest: "/home/{{ ansible_ssh_user }}/.emacs.d"
     clone: yes
-    force: no
+    force: yes
     accept_hostkey: yes
  
 - name: make spacemacs config file
