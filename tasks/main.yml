@@ -31,7 +31,7 @@
  
 - name: make spacemacs config file
   template: 
-    src: spacemacs.config.j2 
+    src: spacemacs.config.ab 
     dest: '/home/{{ ansible_ssh_user }}/.spacemacs' 
     owner: '{{ ansible_ssh_user }}'
     group: '{{ ansible_ssh_user }}' 
