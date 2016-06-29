@@ -41,7 +41,7 @@
   blockinfile:
     dest: '/home/{{ ansible_ssh_user }}/.bashrc'
     insertbefore: "#THIS MUST BE "
-    marker: "# {mark} ANSIBLE MANAGED BLOCK {{item.name}}"
+    marker: "# {mark} ANSIBLE MANAGED BLOCK emacs config"
     block: |
       export ALTERNATE_EDITOR=""
       alias e='emacsclient -t'
