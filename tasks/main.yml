@@ -5,12 +5,16 @@
 
 # git clone https://github.com/syl20bnr/spacemacs ~/.emacs.d
 
-- name: install git 
+- name: install spacemacs requirements 
   become: yes
   apt:
+    name: {{ item }}
     name: git-core
     update_cache: yes
-    state: present 
+    state: present
+    with_items:
+      git_core
+      pandoc
 
 - name: install emacs 
   become: yes
