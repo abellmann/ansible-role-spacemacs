@@ -40,10 +40,9 @@
 - name: start emacs server if not present
   blockinfile:
     dest: '/home/{{ ansible_ssh_user }}/.bashrc'
-    insertbefore: "#THIS MUST BE "    
+    insertbefore: "#THIS MUST BE "
+    marker: "# {mark} ANSIBLE MANAGED BLOCK {{item.name}}"
     block: |
       export ALTERNATE_EDITOR=""
       alias e='emacsclient -t'
-    marker:"# {mark} ANSIBLE MANAGED BLOCK {{item.name}}"
 
-  
