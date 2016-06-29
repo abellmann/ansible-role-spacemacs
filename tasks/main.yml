@@ -44,5 +44,5 @@
     marker: "# {mark} ANSIBLE MANAGED BLOCK emacs config"
     block: |
       export ALTERNATE_EDITOR=""
-      alias e='emacsclient -t'
+      alias e='emacsclient'
 
