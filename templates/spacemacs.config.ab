@@ -34,14 +34,14 @@ values."
      ;;better-defaults 
      emacs-lisp
      eyebrowse
-     git
+     ;;git
      github
      html
      (ibuffer :variables ibuffer-group-buffers-by nil)
      java
      markdown
      outlook
-     ;;org
+     org
      ;;org-ab
      osx
      pandoc
@@ -282,7 +282,7 @@ layers configuration. You are free to put any user code."
 
   (global-set-key (kbd "M-<up>") 'move-line-up)
   (global-set-key (kbd "M-<down>") 'move-line-down)
-  (global-set-key (kbd "C-; o s") 'just-one-space)
+;;  (global-set-key (kbd "C-; o s") 'just-one-space)
 
 
   ;; Settings
