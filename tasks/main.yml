@@ -8,42 +8,73 @@
 - name: install spacemacs requirements 
   become: yes
   apt:
-    name: {{ item }}
-    name: git-core
+    name: "{{ item }}"
     update_cache: yes
     state: present
-    with_items:
-      git_core
-      pandoc
+  with_items:
+    - git-core
+    - pandoc
+    - build-essential
 
-- name: install emacs 
+
+
+- name: install required dependencies
+  apt:
+    name: "{{ item }}"
+    state: build-dep
+  with_items:
+    - emacs24
+
+
+- name: download emacs 24.4
+  get_url:
+    dest: /tmp/emacs-24.4.tar.gz
+    url: http://ftp.gnu.org/gnu/emacs/emacs-24.4.tar.gz
+
+- name: unpack emacs
+  unarchive:
+    src: /tmp/emacs-24.4.tar.gz
+    dest: /tmp
+
+- name: configure emacs
+  shell: "{{ item }}"
+  args:
+    chdir: /tmp/emacs-24.4
+  with_items:
+    ./configure
+
+- name: compile emacs
+  make:
+    chdir: /tmp/emacs-24.4
+
+- name: install emacs
+  make:
+    chdir: /tmp/emacs-24.4
+    target: install
   become: yes
-  apt: 
-    name: emacs
-    update_cache: yes
-    state: present
 
 - name: install spacemacs 
   git:
     repo: "https://github.com/syl20bnr/spacemacs"
-    dest: "/home/{{ ansible_ssh_user }}/.emacs.d"
+    dest: "/home/{{ ansible_user }}/.emacs.d"
     clone: yes
     force: yes
     accept_hostkey: yes
+    version: master
   become: yes
-  become_user: "{{ansible_ssh_user}}" 
+  become_user: "{{ansible_user}}" 
  
 - name: make spacemacs config file
   template: 
     src: spacemacs.config.ab 
-    dest: '/home/{{ ansible_ssh_user }}/.spacemacs' 
-    owner: '{{ ansible_ssh_user }}'
-    group: '{{ ansible_ssh_user }}' 
+    dest: '/home/{{ ansible_user }}/.spacemacs' 
+    owner: '{{ ansible_user }}'
+    group: '{{ ansible_user }}' 
     mode: 0640
 
 - name: start emacs server if not present
   blockinfile:
-    dest: '/home/{{ ansible_ssh_user }}/.bashrc'
+    dest: '/home/{{ ansible_user }}/.bashrc'
     insertbefore: "#THIS MUST BE "
     marker: "# {mark} ANSIBLE MANAGED BLOCK emacs config"
     block: |
