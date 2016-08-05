@@ -21,7 +21,8 @@
   register: emacs_result
 
 - name: set emacs_installed var
-  set_fact: emacs_installed: true
+  set_fact:
+    emacs_installed: true
   when: emacs_result|succeeded and "24.4" in "{{ emacs_result }}"
   
 - name: install spacemacs requirements 
@@ -103,3 +104,21 @@
       export ALTERNATE_EDITOR=""
       alias e='emacsclient'
 
+
+- name: copy ediff function
+  copy:
+    src: "{{ role_path }}/files/ediff.sh"
+    dest: /tmp
+
+- name: insert text of ediff.sh in var
+  shell: cat /tmp/ediff.sh
+  register: ediff_data
+    
+- name: call emacs for diffing files with ediff function
+  blockinfile:
+    dest: '/home/{{ ansible_user }}/.bashrc'
+    insertbefore: "#THIS MUST BE "
+    marker: "# {mark} ANSIBLE MANAGED BLOCK emacs config"
+    block: |
+      {{ ediff_data.stdout }}
+    
