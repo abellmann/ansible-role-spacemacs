@@ -5,6 +5,15 @@
 
 # git clone https://github.com/syl20bnr/spacemacs ~/.emacs.d
 
+- name: check emacs installation
+  command: emacs --version
+  ignore_errors: true
+  register: emacs_result
+
+- name: set emacs_installed var
+  set_fact: emacs_installed: true
+  when: emacs_result|succeeded and "24.4" in "{{ emacs_result }}"
+
 - name: install spacemacs requirements 
   become: yes
   apt:
@@ -42,16 +51,19 @@
     chdir: /tmp/emacs-24.4
   with_items:
     ./configure
+  when: not emacs_installed
 
 - name: compile emacs
   make:
     chdir: /tmp/emacs-24.4
+  when: not emacs_installed
 
 - name: install emacs
   make:
     chdir: /tmp/emacs-24.4
     target: install
   become: yes
+  when: not emacs_installed
 
 - name: install spacemacs 
   git:
