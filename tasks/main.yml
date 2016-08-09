@@ -62,19 +62,19 @@
     chdir: "{{ emacs_source_dir }}/emacs-24.4"
   with_items:
     ./configure
-  when: not emacs_installed
+  when:  emacs_installed is undefined
 
 - name: compile emacs
   make:
     chdir: "{{ emacs_source_dir }}/emacs-24.4"
-  when: not emacs_installed
+  when: emacs_installed is undefined
 
 - name: install emacs
   make:
     chdir: "{{ emacs_source_dir }}/emacs-24.4"
     target: install
   become: yes
-  when: not emacs_installed
+  when: emacs_installed is undefined
 
 - name: install spacemacs 
   git:
