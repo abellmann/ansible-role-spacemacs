@@ -24,7 +24,7 @@
   set_fact:
     emacs_installed: true
   when: emacs_result|succeeded and "{{ emacs_version }}" in "{{ emacs_result }}"
-  
+
 - name: install spacemacs requirements 
   become: yes
   apt:
@@ -35,8 +35,7 @@
     - git-core
     - pandoc
     - build-essential
-
-
+  when: emacs_installed is undefined    
 
 - name: install required dependencies
   apt:
@@ -44,17 +43,19 @@
     state: build-dep
   with_items:
     - emacs24
-
+  when: emacs_installed is undefined
 
 - name: download emacs {{ emacs_version }}
   get_url:
     dest: "{{ emacs_source_dir }}/emacs-{{ emacs_version }}.tar.gz"
     url: "http://ftp.gnu.org/gnu/emacs/emacs-{{ emacs_version }}.tar.gz"
+  when: emacs_installed is undefined    
 
 - name: unpack emacs
   unarchive:
     src: "{{ emacs_source_dir }}/emacs-{{ emacs_version }}.tar.gz"
     dest: "{{ emacs_source_dir }}"
+  when: emacs_installed is undefined
 
 - name: configure emacs
   shell: "{{ item }}"
@@ -85,7 +86,8 @@
     accept_hostkey: yes
     version: master
   become: yes
-  become_user: "{{ansible_user}}" 
+  become_user: "{{ansible_user}}"
+  when: emacs_installed is undefined
  
 - name: make spacemacs config file
   template: 
@@ -123,7 +125,6 @@
 - name: call emacs for diffing files with ediff function
   blockinfile:
     dest: '/home/{{ ansible_user }}/.bashrc'
-    insertbefore: "#THIS MUST BE "
     marker: "# {mark} ANSIBLE MANAGED BLOCK emacs config"
     block: |
       {{ ediff_data.stdout }}
