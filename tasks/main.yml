@@ -25,70 +25,67 @@
     emacs_installed: true
   when: emacs_result|succeeded and "{{ emacs_version }}" in "{{ emacs_result }}"
 
-- name: install spacemacs requirements 
-  become: yes
-  apt:
-    name: "{{ item }}"
-    update_cache: yes
-    state: present
-  with_items:
-    - git-core
-    - pandoc
-    - build-essential
+
+- block:
+  - name: install spacemacs requirements 
+    become: yes
+    apt:
+      name: "{{ item }}"
+      update_cache: yes
+      state: present
+    with_items:
+      - git-core
+      - pandoc
+      - build-essential
+
+
+  - name: install required dependencies
+    apt:
+      name: "{{ item }}"
+      state: build-dep
+    with_items:
+      - emacs24
+   
+  - name: download emacs {{ emacs_version }}
+    get_url:
+      dest: "{{ emacs_source_dir }}/emacs-{{ emacs_version }}.tar.gz"
+      url: "http://ftp.gnu.org/gnu/emacs/emacs-{{ emacs_version }}.tar.gz"    
+   
+  - name: unpack emacs
+    unarchive:
+      src: "{{ emacs_source_dir }}/emacs-{{ emacs_version }}.tar.gz"
+      dest: "{{ emacs_source_dir }}"
+   
+  - name: configure emacs
+    shell: "{{ item }}"
+    args:
+      chdir: "{{ emacs_source_dir }}/emacs-{{ emacs_version }}"
+    with_items:
+      ./configure
+   
+  - name: compile emacs
+    make:
+      chdir: "{{ emacs_source_dir }}/emacs-{{ emacs_version }}"
+   
+  - name: install emacs
+    make:
+      chdir: "{{ emacs_source_dir }}/emacs-{{ emacs_version }}"
+      target: install
+    become: yes
+   
+  - name: install spacemacs 
+    git:
+      repo: "https://github.com/syl20bnr/spacemacs"
+      dest: "/home/{{ ansible_user }}/.emacs.d"
+      clone: yes
+      force: yes
+      accept_hostkey: yes
+      version: master
+    become: yes
+    become_user: "{{ansible_user}}"
+
   when: emacs_installed is undefined    
 
-- name: install required dependencies
-  apt:
-    name: "{{ item }}"
-    state: build-dep
-  with_items:
-    - emacs24
-  when: emacs_installed is undefined
-
-- name: download emacs {{ emacs_version }}
-  get_url:
-    dest: "{{ emacs_source_dir }}/emacs-{{ emacs_version }}.tar.gz"
-    url: "http://ftp.gnu.org/gnu/emacs/emacs-{{ emacs_version }}.tar.gz"
-  when: emacs_installed is undefined    
-
-- name: unpack emacs
-  unarchive:
-    src: "{{ emacs_source_dir }}/emacs-{{ emacs_version }}.tar.gz"
-    dest: "{{ emacs_source_dir }}"
-  when: emacs_installed is undefined
-
-- name: configure emacs
-  shell: "{{ item }}"
-  args:
-    chdir: "{{ emacs_source_dir }}/emacs-{{ emacs_version }}"
-  with_items:
-    ./configure
-  when:  emacs_installed is undefined
-
-- name: compile emacs
-  make:
-    chdir: "{{ emacs_source_dir }}/emacs-{{ emacs_version }}"
-  when: emacs_installed is undefined
-
-- name: install emacs
-  make:
-    chdir: "{{ emacs_source_dir }}/emacs-{{ emacs_version }}"
-    target: install
-  become: yes
-  when: emacs_installed is undefined
-
-- name: install spacemacs 
-  git:
-    repo: "https://github.com/syl20bnr/spacemacs"
-    dest: "/home/{{ ansible_user }}/.emacs.d"
-    clone: yes
-    force: yes
-    accept_hostkey: yes
-    version: master
-  become: yes
-  become_user: "{{ansible_user}}"
-  when: emacs_installed is undefined
- 
 - name: make spacemacs config file
   template: 
     src: spacemacs.config.ab 
