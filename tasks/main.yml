@@ -49,7 +49,14 @@
   - name: download emacs {{ emacs_version }}
     get_url:
       dest: "{{ emacs_source_dir }}/emacs-{{ emacs_version }}.tar.gz"
-      url: "http://ftp.gnu.org/gnu/emacs/emacs-{{ emacs_version }}.tar.gz"    
+      url: "http://ftp.gnu.org/gnu/emacs/emacs-{{ emacs_version }}.tar.gz"
+    when: offline_mode is undefined
+
+  - name: copy emacs {{ emacs_version }}
+    copy:
+      src: "binaries/emacs-{{ emacs_version }}.tar.gz"
+      dest:  "{{ emacs_source_dir }}/emacs-{{ emacs_version }}.tar.gz"
+    when: offline_mode is defined
    
   - name: unpack emacs
     unarchive:
